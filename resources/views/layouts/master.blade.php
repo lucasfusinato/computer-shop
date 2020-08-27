@@ -9,7 +9,7 @@
     <script src={{ asset('js/app.js') }} async></script>
 </head>
 <body>
-    <div class="p-3">
+    <div class="p-3 text-center">
         @yield('content')
     </div>
 </body>
