@@ -3,7 +3,10 @@
 @section('title', 'Products')
 
 @section('content')
-<a class="btn btn-primary mb-1" href={{ route('products.create') }} role="button">Create</a>
+<h1>Products</h1>
+<div class="text-left">
+    <a class="btn btn-primary mb-1" href={{ route('products.create') }} role="button">Create</a>
+<a class="btn btn-secondary mb-1" href={{ route('home') }} role="button">Home</a>
 <table class="table table-striped">
     <thead>
       <tr>
@@ -37,4 +40,5 @@
         @endif
     </tbody>
   </table>
+</div>
 @endsection
