@@ -25,7 +25,7 @@
                     <td>{{ $product->manufacturer }}</td>
                     <td>
                         <a class="btn btn-warning" href={{ route('products.edit', $product) }} role="button">Edit</a>
-                        <button class="btn btn-danger" onclick="document.getElementById('delete').submit()">Destroy</button>
+                        <button class="btn btn-danger" onclick="document.getElementById('delete').submit()">Delete</button>
                         <form id="delete" action={{ route('products.destroy', $product) }} method="POST">
                             @csrf
                             @method('DELETE')
