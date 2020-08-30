@@ -33,7 +33,7 @@ class ProductForm extends FormRequest
     /**
      * Persist product data in database.
      *
-     * @return array
+     * @param Product $product
      */
     public function persist(Product $product)
     {
