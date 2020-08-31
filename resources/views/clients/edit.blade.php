@@ -40,7 +40,7 @@
         <select class="form-control @error('state_id') is-invalid @enderror" id="state_id" name="state_id" aria-describedby="stateHelp" required>
           <option value="">Select the client address's state</option>
           @foreach ($states as $state)
-            <option value="{{ $state->id }}" @if ($state->id == old('state_id', $client->state_id)) selected @endif>{{ $state->name }}</option>
+            <option value="{{ $state->id }}" data-uf="{{ $state->uf }}" @if ($state->id == old('state_id', $client->state_id)) selected @endif>{{ $state->name }}</option>
           @endforeach
         </select>
         @error('state_id') <small id="stateHelp" class="form-text text-danger">{{ $message }}</small> @enderror
@@ -77,4 +77,63 @@
     <a class="btn btn-secondary" href={{ route('clients.index') }} role="button">Back</a>
   </form>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+(function(document) {
+
+  const findCepData = cep => {
+    return new Promise((resolve, reject) => {
+      const oHttpRequest = new XMLHttpRequest();
+      oHttpRequest.onreadystatechange = function () {
+          if (oHttpRequest.readyState === 4) {
+              if (oHttpRequest.status === 200) {
+                  const dados = JSON.parse(oHttpRequest.responseText);
+                  if (dados.erro) {
+                      reject();
+                  } else {
+                      resolve(dados);
+                  }
+              } else {
+                  reject();
+              }
+          }
+      };
+      oHttpRequest.open('get', `https://viacep.com.br/ws/${cep}/json/`, true);
+      oHttpRequest.send();
+    });
+  };
+
+  const handleStateSelection = (stateOption, uf) => {
+    if(stateOption.getAttribute('data-uf') === uf) {
+      stateOption.setAttribute('selected', true);
+    } else {
+      stateOption.removeAttribute('selected');
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const cepField = document.querySelector('#cep');
+    const stateField = document.querySelector('#state_id');
+    const stateFieldOptions = stateField.querySelectorAll('option');
+    const cityField = document.querySelector('#city');
+    const districtField = document.querySelector('#district');
+    const streetField = document.querySelector('#street');
+
+    cepField.addEventListener('change', () => {
+      if(cepField.checkValidity()) {
+        findCepData(cepField.value).then(cepData => {
+          stateFieldOptions.forEach(stateOption => handleStateSelection(stateOption, cepData.uf));
+          cityField.value = cepData.localidade;
+          districtField.value = cepData.bairro;
+          streetField.value = cepData.logradouro;
+        });
+      }
+    });
+    
+  });
+  
+}(document));
+</script>    
 @endsection

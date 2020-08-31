@@ -7,10 +7,11 @@
     <title>@yield('title')</title>
     <link rel="stylesheet" href={{ asset('css/app.css') }}>
     <script src={{ asset('js/app.js') }} async></script>
-</head>
-<body>
+    <body>
+    </head>
     <div class="p-3 text-center">
         @yield('content')
     </div>
 </body>
+@yield('scripts')
 </html>
