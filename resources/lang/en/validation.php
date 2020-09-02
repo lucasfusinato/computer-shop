@@ -118,6 +118,10 @@ return [
     'url' => 'The :attribute format is invalid.',
     'uuid' => 'The :attribute must be a valid UUID.',
 
+    //Custom validator
+    'cpf' => 'The CPF must be valid.',
+    'cep' => 'The CEP must be valid.',
+
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines

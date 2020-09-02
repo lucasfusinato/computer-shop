@@ -26,8 +26,8 @@ class ClientForm extends FormRequest
     {
         return [
             'name' => 'required|max:200',
-            'cpf' => 'required|min:14|max:14',
-            'cep' => 'max:9',
+            'cpf' => 'required|cpf',
+            'cep' => 'cep',
             'state_id' => 'required',
             'city' => 'required|max:200',
             'district' => 'max:200',
