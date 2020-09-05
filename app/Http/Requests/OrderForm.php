@@ -26,7 +26,6 @@ class OrderForm extends FormRequest
      */
     public function rules()
     {
-        return [];
         return [
             'client_id' => 'required',
             'items' => 'required|array|min:1',
@@ -50,14 +49,13 @@ class OrderForm extends FormRequest
         $order->save();
         
         foreach($this->items as $item) {
-            if(isset($item->product_id) && !empty($item->product_id)) {
-                $orderProduct = new OrderProduct();
-                $orderProduct->product_id = $item->product_id;
-                $orderProduct->quantity = $item->quantity;
-                $orderProduct->unit_price = $item->unit_price;
-                $orderProduct->total_discount = $item->total_discount ?: 0;
-                $order->items()->save($orderProduct);
-            }
+            $order->items()->save(new OrderProduct([
+                'id' => $item['id'],
+                'product_id' => $item['product_id'],
+                'quantity' => $item['quantity'],
+                'unit_price' => $item['unit_price'],
+                'total_discount' => $item['total_discount'] ?: 0
+            ]));
         }
 
         DB::commit();
