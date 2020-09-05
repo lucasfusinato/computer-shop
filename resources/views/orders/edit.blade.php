@@ -34,10 +34,11 @@
     <table class="table table-striped table-sm" id="items">
       <thead>
         <tr>
-          <th scope="col" width="45%">Product</th>
-          <th scope="col" width="15%">Quantity</th>
-          <th scope="col" width="15%">Unit Price</th>
-          <th scope="col" width="15%">Total Discount</th>
+          <th scope="col" width="50%">Product</th>
+          <th scope="col" width="10%">Quantity</th>
+          <th scope="col" width="10%">Unit Price</th>
+          <th scope="col" width="10%">Total Discount</th>
+          <th scope="col" width="10%">Total Price</th>
           <th scope="col" width="10%">Actions</th>
         </tr>
       </thead>
@@ -62,6 +63,9 @@
           </td>
           <td>
             <input type="number" class="form-control" name="items[][total_discount]" placeholder="0,00" disabled>
+          </td>
+          <td>
+            <input type="number" class="form-control" data-total-price="true" placeholder="0,00" readonly>
           </td>
           <td>
               <button class="btn btn-danger" data-delete="true">Delete</button>
@@ -212,6 +216,7 @@
       const quantityField = item.querySelector('[name*="[quantity]"]');
       const unitPriceField = item.querySelector('[name*="[unit_price]"]');
       const totalDiscountField = item.querySelector('[name*="[total_discount]"]');
+      const totalPriceField = item.querySelector('[data-total-price="true"]');
       const itemDeleteButton = item.querySelector('[data-delete="true"]');
 
       const nameAttribute = (property, id) => {
@@ -249,6 +254,7 @@
         updateFieldState(quantityField, true);
         updateFieldState(unitPriceField, true);
         updateFieldState(totalDiscountField, false);
+        updateTotalPrice();
       };
 
       const onChangeProductField = () => {
@@ -266,8 +272,20 @@
         }
       };
 
+      const updateTotalPrice = () => {
+        if(hasValue(unitPriceField) && hasValue(quantityField)) {
+          const totalPrice = (parseFloat(unitPriceField.value) * parseInt(quantityField.value)) - parseFloat(totalDiscountField.value || 0);
+          totalPriceField.value = totalPrice;
+        } else {
+          totalPriceField.value = '';
+        }
+      };
+
       itemProductField.addEventListener('change', onChangeProductField);
       itemProductField.addEventListener('blur', onBlurProductField);
+      unitPriceField.addEventListener('change', updateTotalPrice);
+      quantityField.addEventListener('change', updateTotalPrice);
+      totalDiscountField.addEventListener('change', updateTotalPrice);
       itemDeleteButton.addEventListener('click', onClickDeleteButton);
       itemsTableBody.appendChild(item);
       
