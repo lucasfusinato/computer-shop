@@ -48,12 +48,16 @@ class OrderForm extends FormRequest
         $order->client_id = $this->client_id;
         $order->save();
         
+        $order->items()->delete();
         foreach($this->items as $item) {
-            $orderProduct = (isset($item['id']) && !empty($item['id'])) ? OrderProduct::find($item['id']) : new OrderProduct();
+            $orderProduct = (isset($item['id']) && !empty($item['id'])) ? OrderProduct::withTrashed()->find($item['id']) : new OrderProduct();
             $orderProduct->product_id = $item['product_id'];
             $orderProduct->quantity = $item['quantity'];
             $orderProduct->unit_price = $item['unit_price'];
             $orderProduct->total_discount = $item['total_discount'] ?: 0;
+            if($orderProduct->trashed()) {
+                $orderProduct->restore();
+            }
             $order->items()->save($orderProduct);
         }
 

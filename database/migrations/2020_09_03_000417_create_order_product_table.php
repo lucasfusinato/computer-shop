@@ -22,7 +22,6 @@ class CreateOrderProductTable extends Migration
             $table->float('total_discount')->default(0);
             $table->timestamps();
             $table->softDeletes();
-            $table->unique(['order_id', 'product_id']);
         });
     }
 
