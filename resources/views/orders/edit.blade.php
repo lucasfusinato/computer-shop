@@ -7,9 +7,6 @@
 @section('title', $title)
 
 @section('content')
-@if ($errors->any())
-    {{implode(',',$errors->all())}}
-@endif
 <h1>{{ $title }}</h1>
 <div class="text-left">
   @if ($order->exists)
