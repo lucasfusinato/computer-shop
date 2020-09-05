@@ -99,7 +99,7 @@
       if(!orderForm.checkValidity()) {
         return orderForm.reportValidity();
       }
-      if(!reportValidityFirstItem() && !reportValidityUniqueProduct()) {
+      if(!reportValidityFirstItem() && !reportValidityUniqueProduct() && !reportValidityTotalPrice()) {
         removeRowsWithoutProduct();
         reorganizeFieldNames();
         orderForm.submit();
@@ -115,7 +115,7 @@
     };
     
     const resetValidityItems = () => {
-      getProductFields().forEach(resetValidityItem);
+      itemsTableBody.querySelectorAll('option[name],input[name]').forEach(resetValidityItem);
     };
 
     const reportValidityFirstItem = () => {
@@ -143,6 +143,19 @@
       return reportValidity;
     };
 
+    const reportValidityTotalPrice = () => {
+      let reportValidity = false;
+      getTotalPriceFields().filter(totalPriceField => hasValue(totalPriceField)).forEach(totalPriceField => {
+        if(!reportValidity && parseFloat(totalPriceField.value) < 0) {
+          const totalDiscountField = getRow(totalPriceField).querySelector('[name*="[total_discount]"]');
+          totalDiscountField.setCustomValidity('O desconto não pode gerar preço negativo.');
+          totalDiscountField.reportValidity();
+          reportValidity = true;
+        }
+      });
+      return reportValidity;
+    };
+
     const removeRowsWithoutProduct = () => {
       getProductFields().filter(field => !hasValue(field)).forEach(field => {
         const row = getRow(field);
@@ -153,7 +166,7 @@
     const reorganizeFieldNames = () => {
       getProductFields().filter(field => field.getAttribute('name')).forEach((field, index) => {
         const row = getRow(field);
-        row.querySelectorAll('select,input').forEach(fieldElement => fieldElement.setAttribute('name', fieldElement.getAttribute('data-default-name').replace('[?]', `[${index}]`)));
+        row.querySelectorAll('select[name],input[name]').forEach(fieldElement => fieldElement.setAttribute('name', fieldElement.getAttribute('data-default-name').replace('[?]', `[${index}]`)));
       });
     };
 
@@ -172,6 +185,10 @@
 
     const getProductFields = () => {
       return Array.prototype.slice.call(itemsTableBody.querySelectorAll('[name*="[product_id]"]'));
+    };
+
+    const getTotalPriceFields = () => {
+      return Array.prototype.slice.call(itemsTableBody.querySelectorAll('[data-total-price="true"]'));
     };
 
     const updateExtraItem = () => {
@@ -266,6 +283,10 @@
         resetValidityItem(itemProductField);
       };
 
+      const onBlurTotalDiscount = () => {
+        resetValidityItem(totalDiscountField);
+      };
+
       const onClickDeleteButton = () => {
         if(!itemDeleteButton.getAttribute('disabled')) {
           deleteItem(itemProductField);
@@ -286,6 +307,8 @@
       unitPriceField.addEventListener('change', updateTotalPrice);
       quantityField.addEventListener('change', updateTotalPrice);
       totalDiscountField.addEventListener('change', updateTotalPrice);
+      totalDiscountField.addEventListener('input', onBlurTotalDiscount);
+      totalDiscountField.addEventListener('blur', onBlurTotalDiscount);
       itemDeleteButton.addEventListener('click', onClickDeleteButton);
       itemsTableBody.appendChild(item);
       
