@@ -49,13 +49,12 @@ class OrderForm extends FormRequest
         $order->save();
         
         foreach($this->items as $item) {
-            $order->items()->save(new OrderProduct([
-                'id' => $item['id'],
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'unit_price' => $item['unit_price'],
-                'total_discount' => $item['total_discount'] ?: 0
-            ]));
+            $orderProduct = (isset($item['id']) && !empty($item['id'])) ? OrderProduct::find($item['id']) : new OrderProduct();
+            $orderProduct->product_id = $item['product_id'];
+            $orderProduct->quantity = $item['quantity'];
+            $orderProduct->unit_price = $item['unit_price'];
+            $orderProduct->total_discount = $item['total_discount'] ?: 0;
+            $order->items()->save($orderProduct);
         }
 
         DB::commit();
