@@ -59,13 +59,13 @@
             <input type="number" class="form-control" name="items[][quantity]" placeholder="0" min="1" disabled>
           </td>
           <td>
-            <input type="number" class="form-control" name="items[][unit_price]" placeholder="0,00" disabled>
+            <input type="number" class="form-control" name="items[][unit_price]" placeholder="0,00" step="0.01" disabled>
           </td>
           <td>
-            <input type="number" class="form-control" name="items[][total_discount]" placeholder="0,00" disabled>
+            <input type="number" class="form-control" name="items[][total_discount]" placeholder="0,00" step="0.01" disabled>
           </td>
           <td>
-            <input type="number" class="form-control" data-total-price="true" placeholder="0,00" readonly>
+            <input type="number" class="form-control" data-total-price="true" placeholder="0,00" step="0.01" readonly>
           </td>
           <td>
               <button class="btn btn-danger" data-delete="true">Delete</button>
