@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\DB;
 use App\Order;
 use App\OrderProduct;
+use \Exception;
 
 class OrderForm extends FormRequest
 {
@@ -43,24 +44,39 @@ class OrderForm extends FormRequest
      */
     public function persist(Order $order)
     {
-        DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-        $order->client_id = $this->client_id;
-        $order->save();
-        
-        $order->items()->delete();
-        foreach($this->items as $item) {
-            $orderProduct = (isset($item['id']) && !empty($item['id'])) ? OrderProduct::withTrashed()->find($item['id']) : new OrderProduct();
-            $orderProduct->product_id = $item['product_id'];
-            $orderProduct->quantity = $item['quantity'];
-            $orderProduct->unit_price = $item['unit_price'];
-            $orderProduct->total_discount = $item['total_discount'] ?: 0;
-            if($orderProduct->trashed()) {
-                $orderProduct->restore();
+            $order->client_id = $this->client_id;
+            $order->save();
+            
+            $order->items()->delete();
+            foreach($this->items as $item) {
+                $orderProduct = (isset($item['id']) && !empty($item['id'])) ? OrderProduct::withTrashed()->find($item['id']) : new OrderProduct();
+                $orderProduct->product_id = $item['product_id'];
+                $orderProduct->quantity = $item['quantity'];
+                $orderProduct->unit_price = $item['unit_price'];
+                $orderProduct->total_discount = $item['total_discount'] ?: 0;
+                if($order->items()->where('product_id', $orderProduct->product_id)->count() > 0) {
+                    throw new Exception('O pedido não pode ter produtos duplicados.');
+                }
+                if($orderProduct->totalPrice() < 0) {
+                    throw new Exception('O desconto não pode gerar preço negativo.');
+                }
+                if($orderProduct->trashed()) {
+                    $orderProduct->restore();
+                }
+                $order->items()->save($orderProduct);
             }
-            $order->items()->save($orderProduct);
+    
+            if($order->items()->count() == 0) {
+                throw new Exception('O pedido deve ter pelo menos um item.');
+            }
+    
+            DB::commit();
+        } catch(Exception $exception) {
+            DB::rollback();
+            throw $exception;
         }
-
-        DB::commit();
     }
 }
