@@ -21,5 +21,13 @@
                 <a href={{ route('clients.index') }} class="btn btn-success stretched-link">Click to open</a>
             </div>
         </div>
+        <div class="card text-white bg-danger mb-3">
+            <div class="card-header">Orders</div>
+            <div class="card-body">
+                <h5 class="card-title">Order registration</h5>
+                <p class="card-text">Create, read, update and delete orders.</p>
+                <a href={{ route('orders.index') }} class="btn btn-danger stretched-link">Click to open</a>
+            </div>
+        </div>
     </div>
 @endsection
