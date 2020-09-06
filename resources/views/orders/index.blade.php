@@ -11,7 +11,8 @@
     <thead>
       <tr>
         <th scope="col" width="10%">#</th>
-        <th scope="col" width="60%">Client</th>
+        <th scope="col" width="45%">Client</th>
+        <th scope="col" width="15%">Total Price</th>
         <th scope="col" width="15%">Date/Time</th>
         <th scope="col" width="15%">Actions</th>
       </tr>
@@ -22,6 +23,7 @@
                 <tr>
                     <th scope="row">{{ $order->id }}</th>
                     <td>{{ $order->client->name }}</td>
+                    <td>{{ number_format($order->totalPrice(), 2, ',', '.') }}</td>
                     <td>{{ $order->created_at }}</td>
                     <td>
                         <a class="btn btn-warning" href={{ route('orders.edit', $order) }} role="button">Edit</a>

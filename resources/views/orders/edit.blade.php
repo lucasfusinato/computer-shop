@@ -31,6 +31,10 @@
       @error('client_id') <small id="clientHelp" class="form-text text-danger">{{ $message }}</small> @enderror
       @endif
     </div>
+    <div class="form-group col-md-6">
+      <label for="total_price">Total Price</label>
+      <input type="number" class="form-control" id="total_price" step="0.01" readonly/>
+    </div>
     <table class="table table-striped table-sm" id="items">
       <thead>
         <tr>
@@ -89,9 +93,20 @@
     const itemsTable     = document.querySelector('#items');
     const itemsTableBody = itemsTable.querySelector('tbody');
     const itemTemplate   = itemsTableBody.querySelector('[data-template="true"]');
+    const totalPrice     = document.querySelector('#total_price');
 
     itemTemplate.remove();
     itemTemplate.removeAttribute('data-template');
+
+    const updateOrderTotalPrice = () => {
+      let totalPriceSum = 0;
+      getTotalPriceFields().forEach(totalPriceField => {
+        if(totalPriceField.value) {
+          totalPriceSum += parseFloat(totalPriceField.value);
+        }
+      });
+      totalPrice.value = totalPriceSum.toFixed(2);
+    };
     
     const onClickSaveButton = event => {
       event.preventDefault();
@@ -173,6 +188,7 @@
     const deleteItem = productField => {
       getRow(productField).remove();
       updateDeleteState();
+      updateOrderTotalPrice();
     };
 
     const getRow = productField => {
@@ -296,10 +312,11 @@
       const updateTotalPrice = () => {
         if(hasValue(unitPriceField) && hasValue(quantityField)) {
           const totalPrice = (parseFloat(unitPriceField.value) * parseInt(quantityField.value)) - parseFloat(totalDiscountField.value || 0);
-          totalPriceField.value = totalPrice;
+          totalPriceField.value = totalPrice.toFixed(2);
         } else {
           totalPriceField.value = '';
         }
+        updateOrderTotalPrice();
       };
 
       itemProductField.addEventListener('change', onChangeProductField);

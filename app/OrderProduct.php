@@ -21,7 +21,7 @@ class OrderProduct extends Model
      * 
      * @var array
      */
-        protected $fillable = [
+    protected $fillable = [
         'order_id',
         'product_id',
         'quantity',
@@ -43,5 +43,15 @@ class OrderProduct extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+    
+    /**
+     * Calcula o valor total do item.
+     * 
+     * @return int
+     */
+    public function totalPrice()
+    {
+        return ($this->quantity * $this->unit_price) - $this->total_discount;
     }
 }

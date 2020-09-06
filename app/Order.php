@@ -33,4 +33,18 @@ class Order extends Model
     {
         return $this->hasMany(OrderProduct::class);
     }
+
+    /**
+     * Calcula o valor total do pedido.
+     * 
+     * @return int
+     */
+    public function totalPrice()
+    {
+        $totalPrice = 0;
+        foreach($this->items as $item) {
+            $totalPrice += $item->totalPrice();
+        }
+        return $totalPrice;
+    }
 }
