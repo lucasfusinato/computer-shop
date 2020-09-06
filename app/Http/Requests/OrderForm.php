@@ -28,12 +28,12 @@ class OrderForm extends FormRequest
     public function rules()
     {
         return [
-            'client_id' => 'required',
+            'client_id' => 'required|numeric',
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required',
-            'items.*.quantity' => 'required|min:1',
-            'items.*.unit_price' => 'required',
-            'items.*.total_discount' => ''
+            'items.*.product_id' => 'required|numeric',
+            'items.*.quantity' => 'required|numeric|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.total_discount' => 'nullable|numeric|min:0'
         ];
     }
     
