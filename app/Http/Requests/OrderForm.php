@@ -29,6 +29,7 @@ class OrderForm extends FormRequest
     {
         return [
             'client_id' => 'required|numeric',
+            'discount' => 'nullable|numeric|min:0|max:100',
             'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|numeric',
             'items.*.quantity' => 'required|numeric|min:1',
@@ -48,6 +49,7 @@ class OrderForm extends FormRequest
             DB::beginTransaction();
 
             $order->client_id = $this->client_id;
+            $order->discount = $this->discount;
             $order->save();
             
             $order->items()->delete();
