@@ -69,7 +69,7 @@
             <select class="form-control" name="items[][product_id]">
               <option value="">Select a product</option>
               @foreach ($products as $product)
-                <option value="{{ $product->id }}">{{ $product->name }} - ({{ $product->manufacturer }})</option>
+                <option value="{{ $product->id }}" data-sale-price="{{ $product->sale_price }}">{{ $product->name }} - ({{ $product->manufacturer }})</option>
               @endforeach
             </select>
           </td>
@@ -286,10 +286,13 @@
       updateName(totalDiscountField, 'total_discount');
       itemProductField.removeAttribute('required');
 
-      const updateFieldState = (elementField, required) => {
+      const updateFieldState = (elementField, required, defaultValue) => {
         if(hasValue(itemProductField)) {
           elementField.removeAttribute('disabled');
           elementField.setAttribute('required', true);
+          if(defaultValue) {
+            elementField.value = defaultValue;
+          }
         } else {
           required = false;
           elementField.setAttribute('disabled', true);
@@ -300,11 +303,23 @@
         }
       };
 
+      const getProductSalePrice = () => {
+        let salePrice = null;
+        const selectedProduct = itemProductField.querySelector(`option[value="${itemProductField.value}"]`);
+        if(selectedProduct) {
+          salePrice = parseFloat(selectedProduct.getAttribute('data-sale-price'));
+          if(salePrice) {
+            salePrice = salePrice.toFixed(2);
+          }
+        }
+        return salePrice || '';
+      };
+
       const onChangeProductFieldWithoutUpdateExtraItem = () => {
         resetValidityItem(itemProductField);
-        updateFieldState(quantityField, true);
-        updateFieldState(unitPriceField, true);
-        updateFieldState(totalDiscountField, false);
+        updateFieldState(quantityField, true, '');
+        updateFieldState(unitPriceField, true, getProductSalePrice());
+        updateFieldState(totalDiscountField, false, '');
         updateTotalPrice();
       };
 
