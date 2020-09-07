@@ -27,7 +27,7 @@
       <input type="text" class="form-control @error('cpf') is-invalid @enderror" id="cpf" name="cpf" value="{{ old('cpf', $client->cpf) }}" aria-describedby="cpfHelp" placeholder="000.000.000-00" required minlength="14" maxlength="14">
       @error('cpf') <small id="cpfHelp" class="form-text text-danger">{{ $message }}</small> @enderror
     </div>
-
+    
     <div class="form-group">
       <label for="cep" class="@error('cep') text-danger @enderror">CEP</label>
       <input type="text" class="form-control @error('cep') is-invalid @enderror" id="cep" name="cep" value="{{ old('cep', $client->cep) }}" aria-describedby="cepHelp" placeholder="00000-000" minlength="9" maxlength="9">
@@ -68,8 +68,14 @@
       
       <div class="form-group col-md-2">
         <label for="number" class="@error('number') text-danger @enderror">Number</label>
-        <input type="number" class="form-control @error('number') is-invalid @enderror" id="number" name="number" value="{{ old('number', $client->number) }}" aria-describedby="numberHelp" placeholder="0">
+        <input type="number" class="form-control @error('number') is-invalid @enderror" id="number" name="number" value="{{ old('number', $client->number) }}" aria-describedby="numberHelp" placeholder="0" min="0">
         @error('number') <small id="numberHelp" class="form-text text-danger">{{ $message }}</small> @enderror
+      </div>
+
+      <div class="form-group col-md-2">
+        <label for="default_discount" class="@error('default_discount') text-danger @enderror">Default Discount (%)</label>
+        <input type="number" class="form-control @error('default_discount') is-invalid @enderror" id="default_discount" name="default_discount" value="{{ old('default_discount', $client->default_discount) }}" aria-describedby="defaultDiscountHelp" placeholder="0" min="0" max="100">
+        @error('default_discount') <small id="defaultDiscountHelp" class="form-text text-danger">{{ $message }}</small> @enderror
       </div>
     </div>
 

@@ -28,11 +28,12 @@ class ClientForm extends FormRequest
             'name' => 'required|max:200',
             'cpf' => 'required|cpf',
             'cep' => 'cep',
-            'state_id' => 'required',
+            'state_id' => 'required|numeric',
             'city' => 'required|max:200',
             'district' => 'max:200',
             'street' => 'max:200',
-            'number' => ''
+            'number' => 'nullable|numeric|min:0',
+            'default_discount' => 'nullable|numeric|min:0|max:100'
         ];
     }
     
@@ -51,6 +52,7 @@ class ClientForm extends FormRequest
         $client->district = $this->district;
         $client->street = $this->street;
         $client->number = $this->number;
+        $client->default_discount = $this->default_discount;
 
         $client->save();
     }

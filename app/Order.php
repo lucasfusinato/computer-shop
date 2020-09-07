@@ -15,7 +15,8 @@ class Order extends Model
      * @var array
      */
     protected $fillable = [
-        'client_id'
+        'client_id',
+        'discount'
     ];
     
     /**
@@ -45,6 +46,6 @@ class Order extends Model
         foreach($this->items as $item) {
             $totalPrice += $item->totalPrice();
         }
-        return $totalPrice;
+        return $totalPrice - ($totalPrice * $this->discount / 100);
     }
 }

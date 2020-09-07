@@ -11,8 +11,9 @@
     <thead>
       <tr>
         <th scope="col" width="10%">#</th>
-        <th scope="col" width="35%">Name</th>
-        <th scope="col" width="35%">Manufacturer</th>
+        <th scope="col" width="30%">Name</th>
+        <th scope="col" width="30%">Manufacturer</th>
+        <th scope="col" width="10%">Sale Price</th>
         <th scope="col" width="20%">Actions</th>
       </tr>
     </thead>
@@ -23,10 +24,11 @@
                     <th scope="row">{{ $product->id }}</th>
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->manufacturer }}</td>
+                    <td>{{ isset($product->sale_price) ? number_format($product->sale_price, 2, ',', '.') : '' }}</td>
                     <td>
                         <a class="btn btn-warning" href={{ route('products.edit', $product) }} role="button">Edit</a>
-                        <button class="btn btn-danger" onclick="document.getElementById('delete').submit()">Delete</button>
-                        <form id="delete" action={{ route('products.destroy', $product) }} method="POST">
+                        <button class="btn btn-danger" onclick="document.getElementById('delete_{{ $product->id }}').submit()">Delete</button>
+                        <form id="delete_{{ $product->id }}" action={{ route('products.destroy', $product) }} method="POST">
                             @csrf
                             @method('DELETE')
                         </form>
@@ -35,7 +37,7 @@
             @endforeach
         @else
             <tr>
-                <td colspan="4">No registered products</td>
+                <td colspan="5">No registered products</td>
             </tr>
         @endif
     </tbody>

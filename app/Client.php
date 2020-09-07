@@ -22,7 +22,8 @@ class Client extends Model
         'city',
         'district',
         'street',
-        'number'
+        'number',
+        'default_discount'
     ];
     
     /**

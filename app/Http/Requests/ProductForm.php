@@ -26,7 +26,8 @@ class ProductForm extends FormRequest
     {
         return [
             'name' => 'required|max:200',
-            'manufacturer' => 'required|max:200'
+            'manufacturer' => 'required|max:200',
+            'sale_price' => 'nullable|numeric|min:0'
         ];
     }
 
@@ -39,6 +40,7 @@ class ProductForm extends FormRequest
     {
         $product->name = $this->name;
         $product->manufacturer = $this->manufacturer;
+        $product->sale_price = $this->sale_price;
 
         $product->save();
     }

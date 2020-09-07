@@ -27,8 +27,8 @@
                     <td>{{ $order->created_at }}</td>
                     <td>
                         <a class="btn btn-warning" href={{ route('orders.edit', $order) }} role="button">Edit</a>
-                        <button class="btn btn-danger" onclick="document.getElementById('delete').submit()">Delete</button>
-                        <form id="delete" action={{ route('orders.destroy', $order) }} method="POST">
+                        <button class="btn btn-danger" onclick="document.getElementById('delete_{{ $order->id }}').submit()">Delete</button>
+                        <form id="delete_{{ $order->id }}" action={{ route('orders.destroy', $order) }} method="POST">
                             @csrf
                             @method('DELETE')
                         </form>

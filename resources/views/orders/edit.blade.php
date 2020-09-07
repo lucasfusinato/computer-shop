@@ -16,25 +16,39 @@
   <form method="POST" action="{{ route('orders.store') }}">
   @endif
     @csrf
-    <div class="form-group col-md-6">
-      <label for="client_id" class="@error('client_id') text-danger @enderror">Client</label>
-      @if ($order->exists)
-      <input type="hidden" class="form-control" name="client_id" value="{{ $order->client->id }}" required/>
-      <input type="text" class="form-control" value="{{ $order->client->name }}" readonly/>
-      @else
-      <select class="form-control @error('client_id') is-invalid @enderror" id="client_id" name="client_id" aria-describedby="clientHelp" required>
-        <option value="">Select the order's client</option>
-        @foreach ($clients as $client)
-        <option value="{{ $client->id }}" @if ($client->id == old('client_id', $order->client_id)) selected @endif>{{ $client->name }}</option>
-        @endforeach
-      </select>
-      @error('client_id') <small id="clientHelp" class="form-text text-danger">{{ $message }}</small> @enderror
-      @endif
+    <div class="row">
+      <div class="form-group col-md-6">
+        <label for="client_id" class="@error('client_id') text-danger @enderror">Client</label>
+        @if ($order->exists)
+        <input type="hidden" class="form-control" name="client_id" value="{{ $order->client->id }}" required/>
+        <input type="text" class="form-control" value="{{ $order->client->name }}" readonly/>
+        @else
+        <select class="form-control @error('client_id') is-invalid @enderror" id="client_id" name="client_id" aria-describedby="clientHelp" required>
+          <option value="">Select the order's client</option>
+          @foreach ($clients as $client)
+          <option value="{{ $client->id }}" data-default-discount="{{ $client->default_discount }}" @if ($client->id == old('client_id', $order->client_id)) selected @endif>{{ $client->name }}</option>
+          @endforeach
+        </select>
+        @error('client_id') <small id="clientHelp" class="form-text text-danger">{{ $message }}</small> @enderror
+        @endif
+      </div>
     </div>
-    <div class="form-group col-md-6">
-      <label for="total_price">Total Price</label>
-      <input type="number" class="form-control" id="total_price" step="0.01" readonly/>
+    
+    <div class="row">
+      <div class="form-group col-md-2 col">
+        <label for="total_price">Total Price</label>
+        <input type="number" class="form-control" id="total_price" step="0.01" readonly/>
+      </div>
+      <div class="form-group col-md-2 col">
+        <label for="discount">Total Price Discount (%)</label>
+        <input type="number" class="form-control" name="discount" value="{{ old('discount', $order->discount) }}" id="discount" min="0" max="100" placeholder="0"/>
+      </div>
+      <div class="form-group col-md-2 col">
+        <label for="total_price">Final Price After Discount</label>
+        <input type="number" class="form-control" id="final_price" step="0.01" readonly/>
+      </div>
     </div>
+
     <table class="table table-striped table-sm" id="items">
       <thead>
         <tr>
@@ -55,7 +69,7 @@
             <select class="form-control" name="items[][product_id]">
               <option value="">Select a product</option>
               @foreach ($products as $product)
-                <option value="{{ $product->id }}">{{ $product->name }} - ({{ $product->manufacturer }})</option>
+                <option value="{{ $product->id }}" data-sale-price="{{ $product->sale_price }}">{{ $product->name }} - ({{ $product->manufacturer }})</option>
               @endforeach
             </select>
           </td>
@@ -94,6 +108,9 @@
     const itemsTableBody = itemsTable.querySelector('tbody');
     const itemTemplate   = itemsTableBody.querySelector('[data-template="true"]');
     const totalPrice     = document.querySelector('#total_price');
+    const clientField    = document.querySelector('#client_id');
+    const discountField  = document.querySelector('#discount');
+    const finalPriceField = document.querySelector('#final_price');
 
     itemTemplate.remove();
     itemTemplate.removeAttribute('data-template');
@@ -106,6 +123,7 @@
         }
       });
       totalPrice.value = totalPriceSum.toFixed(2);
+      updateOrderFinalPrice();
     };
     
     const onClickSaveButton = event => {
@@ -268,10 +286,13 @@
       updateName(totalDiscountField, 'total_discount');
       itemProductField.removeAttribute('required');
 
-      const updateFieldState = (elementField, required) => {
+      const updateFieldState = (elementField, required, defaultValue) => {
         if(hasValue(itemProductField)) {
           elementField.removeAttribute('disabled');
           elementField.setAttribute('required', true);
+          if(defaultValue) {
+            elementField.value = defaultValue;
+          }
         } else {
           required = false;
           elementField.setAttribute('disabled', true);
@@ -282,11 +303,23 @@
         }
       };
 
+      const getProductSalePrice = () => {
+        let salePrice = null;
+        const selectedProduct = itemProductField.querySelector(`option[value="${itemProductField.value}"]`);
+        if(selectedProduct) {
+          salePrice = parseFloat(selectedProduct.getAttribute('data-sale-price'));
+          if(salePrice) {
+            salePrice = salePrice.toFixed(2);
+          }
+        }
+        return salePrice || '';
+      };
+
       const onChangeProductFieldWithoutUpdateExtraItem = () => {
         resetValidityItem(itemProductField);
-        updateFieldState(quantityField, true);
-        updateFieldState(unitPriceField, true);
-        updateFieldState(totalDiscountField, false);
+        updateFieldState(quantityField, true, '');
+        updateFieldState(unitPriceField, true, getProductSalePrice());
+        updateFieldState(totalDiscountField, false, '');
         updateTotalPrice();
       };
 
@@ -354,6 +387,24 @@
 
     };
 
+    const updateOrderFinalPrice = () => {
+      let totalPriceSum = (parseFloat(totalPrice.value) || 0);
+      if(totalPriceSum > 0) {
+        totalPriceSum -= (totalPriceSum * (parseInt(discountField.value) || 0) / 100);
+      }
+      finalPriceField.value = totalPriceSum.toFixed(2);
+    };
+
+    const onChangeClientField = () => {
+      const defaultDiscount = clientField.querySelector(`option[value="${clientField.value}"]`).getAttribute('data-default-discount');
+      discountField.value = (parseInt(defaultDiscount) || 0);
+      updateOrderFinalPrice();
+    };
+
+    discountField.addEventListener('change', updateOrderFinalPrice);
+    if(clientField) {
+      clientField.addEventListener('change', onChangeClientField);
+    }
     saveButton.addEventListener('click', onClickSaveButton);
 
     @php
@@ -363,6 +414,7 @@
       addItem({!! (is_array($item) ? collect($item) : $item)->toJson() !!}, {{ $errors->has("items.{$i}.*") ? 'true' : 'false' }});
     @endforeach
     updateExtraItem();
+    updateOrderTotalPrice();
 
   });
   

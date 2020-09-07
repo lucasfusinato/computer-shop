@@ -26,6 +26,11 @@
       <input type="text" class="form-control @error('manufacturer') is-invalid @enderror" id="manufacturer" name="manufacturer" value="{{ old('manufacturer', $product->manufacturer) }}" aria-describedby="manufacturerHelp" placeholder="Enter the manufacturer name" required maxlength="200">
       @error('manufacturer') <small id="manufacturerHelp" class="form-text text-danger">{{ $message }}</small> @enderror
     </div>
+    <div class="form-group">
+      <label for="salePrice" class="@error('sale_price') text-danger @enderror">Sale Price</label>
+      <input type="number" step="0.01" class="form-control @error('sale_price') is-invalid @enderror" id="salePrice" name="sale_price" value="{{ old('sale_price', $product->sale_price) }}" aria-describedby="salePriceHelp" placeholder="0,00">
+      @error('sale_price') <small id="salePriceHelp" class="form-text text-danger">{{ $message }}</small> @enderror
+    </div>
     <button type="submit" class="btn btn-primary">Save</button>
     <a class="btn btn-secondary" href={{ route('products.index') }} role="button">Back</a>
   </form>
