@@ -27,8 +27,8 @@
                     <td>{{ isset($product->sale_price) ? number_format($product->sale_price, 2, ',', '.') : '' }}</td>
                     <td>
                         <a class="btn btn-warning" href={{ route('products.edit', $product) }} role="button">Edit</a>
-                        <button class="btn btn-danger" onclick="document.getElementById('delete').submit()">Delete</button>
-                        <form id="delete" action={{ route('products.destroy', $product) }} method="POST">
+                        <button class="btn btn-danger" onclick="document.getElementById('delete_{{ $product->id }}').submit()">Delete</button>
+                        <form id="delete_{{ $product->id }}" action={{ route('products.destroy', $product) }} method="POST">
                             @csrf
                             @method('DELETE')
                         </form>

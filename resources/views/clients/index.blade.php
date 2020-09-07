@@ -39,8 +39,8 @@
                     <td>{{ $client->default_discount > 0 ? $client->default_discount . '%' : '' }}</td>
                     <td>
                         <a class="btn btn-warning" href={{ route('clients.edit', $client) }} role="button">Edit</a>
-                        <button class="btn btn-danger" onclick="document.getElementById('delete').submit()">Delete</button>
-                        <form id="delete" action={{ route('clients.destroy', $client) }} method="POST">
+                        <button class="btn btn-danger" onclick="document.getElementById('delete_{{ $client->id }}').submit()">Delete</button>
+                        <form id="delete_{{ $client->id }}" action={{ route('clients.destroy', $client) }} method="POST">
                             @csrf
                             @method('DELETE')
                         </form>
